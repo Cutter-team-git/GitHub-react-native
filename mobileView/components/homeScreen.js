@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, Image } from "react-native";
 import axios from "axios";
 
 export default function homeScreen() {
@@ -9,26 +9,33 @@ export default function homeScreen() {
   //declare const to using useState for userInfo
   const [userInfo, setUserInfo] = useState();
 
-  const setUserInformation = event => {
+  const setUserInformation = (event) => {
     setUsersInfo(event.nativeEvent.text);
   };
 
   const getUserInformation = () => {
     axios
       .get(`https://api.github.com/users/${usersInfo}`)
-      .then(response => {
-        let incomingData = response.data;
-        setUserInfo({ ...userInfo, incomingData });
+      .then(({ data }) => {
+        // let incomingData = data;
+        // console.log(data);
+        setUserInfo(data);
       })
       .catch(() => {
         console.log("Not Found");
       });
   };
 
-  return (
+  return userInfo !== undefined ? (
+    <GetUserInformation information={userInfo} />
+  ) : (
     <View>
-      <TextInput title="UserName ..." onChange={setUserInformation} />
-      <Text>----------------------------------------</Text>
+      <TextInput
+        title="UserName ..."
+        onChange={setUserInformation}
+        placeholder="Enter UserName ..."
+        style={{ height: 50 }}
+      />
       <Text>----------------------------------------</Text>
       <Button onPress={getUserInformation} title="Enter One" />
       <Text>----------------------------------------</Text>
@@ -38,6 +45,90 @@ export default function homeScreen() {
           <Text>{userInfo.incomingData.id}</Text>
         </View>
       ) : null}
+    </View>
+  );
+}
+
+export function GetUserInformation(props) {
+  const [playerOne, setPlayerOne] = useState("");
+  const [playerTwo, setPlayerTwo] = useState("");
+  const [result, setResult] = useState([]);
+  const textInputPlayerOne = (event) => {
+    setPlayerOne(event.nativeEvent.text);
+  };
+
+  const textInputPlayerTwo = (event) => {
+    setPlayerTwo(event.nativeEvent.text);
+  };
+  const checkPlay = () => {
+    axios
+      .get(`https://api.github.com/users/${playerOne}`)
+      .then((playerOneData) => {
+        let playerGithubOneData = playerOneData.data;
+        axios
+          .get(`https://api.github.com/users/${playerTwo}`)
+          .then((playerTwoData) => {
+            let playerGithubTwoData = playerTwoData.data;
+            // console.log(playerGithubTwoData.public_repos);
+            // console.log(playerGithubTwoData);
+            if (
+              playerGithubTwoData.public_repos >
+              playerGithubOneData.public_repos
+            ) {
+              setResult([playerGithubTwoData.avatar_url]);
+            } else if (
+              playerGithubTwoData.public_repos <
+              playerGithubOneData.public_repos
+            ) {
+              setResult([playerGithubOneData.avatar_url]);
+            } else {
+              setResult([
+                playerGithubOneData.avatar_url,
+                playerGithubTwoData.avatar_url
+              ]);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const { login, avatar_url } = props.information;
+  return (
+    <View>
+      <View>
+        {/* {console.log(props.information)} */}
+        <Image
+          source={{ uri: avatar_url }}
+          style={{ width: 100, height: 100 }}
+        />
+        <Text>{login}</Text>
+
+        {/* <Text>Ahmad</Text> */}
+      </View>
+      <View>
+        <TextInput onChange={textInputPlayerOne} placeholder="Player One" />
+        <TextInput onChange={textInputPlayerTwo} placeholder="Player Two" />
+        <Button title="Play" onPress={checkPlay} />
+        {result.length !== 0
+          ? result.map((image) => (
+              <View key={Math.random() * 100}>
+                <Text style={{fontWeight:"bold" , color:"yellow" , backgroundColor:"black"}}>The Winner IS </Text>
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: 100, height: 100 }}
+                />
+              </View>
+            ))
+          : null}
+        {/* <Image
+          source={{ uri: avatar_url }}
+          style={{ width: 100, height: 100 }}
+        /> */}
+      </View>
     </View>
   );
 }
@@ -78,4 +169,3 @@ export default function homeScreen() {
 // }
 
 // export default homeScreen;
-
