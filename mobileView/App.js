@@ -1,6 +1,7 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { createAppContainer } from "react-navigation";
+import { createStackNavigator } from "react-navigation-stack";
 import HomeScreen from "./components/homeScreen";
+import User from "./components/user";
 
 export default function App() {
   return (
@@ -19,3 +20,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   }
 });
+
+const App = createAppContainer(MainNavigator);
+
+export default App;

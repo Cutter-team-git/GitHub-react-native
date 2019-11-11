@@ -2,23 +2,21 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, Image } from "react-native";
 import axios from "axios";
 
-export default function homeScreen() {
+export default function homeScreen(props) {
   //declare const to using useState for usersInfo
   const [usersInfo, setUsersInfo] = useState("");
 
   //declare const to using useState for userInfo
   const [userInfo, setUserInfo] = useState();
 
-  const setUserInformation = (event) => {
+  const setUserInformation = event => {
     setUsersInfo(event.nativeEvent.text);
   };
-
+  //get user information using axios
   const getUserInformation = () => {
     axios
       .get(`https://api.github.com/users/${usersInfo}`)
       .then(({ data }) => {
-        // let incomingData = data;
-        // console.log(data);
         setUserInfo(data);
       })
       .catch(() => {
@@ -38,13 +36,19 @@ export default function homeScreen() {
       />
       <Text>----------------------------------------</Text>
       <Button onPress={getUserInformation} title="Enter One" />
+      <Button
+        onPress={() => {
+          props.navigation.navigate("userInfo", "ahmadNavigate");
+        }}
+        title="User Screen"
+      />
       <Text>----------------------------------------</Text>
-      {userInfo !== undefined ? (
+      {/* {userInfo !== undefined ? (
         <View>
-          <Text>{userInfo.incomingData.login}</Text>
-          <Text>{userInfo.incomingData.id}</Text>
+          <Text>{userInfo.login}</Text>
+          <Text>{userInfo.id}</Text>
         </View>
-      ) : null}
+      ) : null} */}
     </View>
   );
 }
@@ -53,21 +57,21 @@ export function GetUserInformation(props) {
   const [playerOne, setPlayerOne] = useState("");
   const [playerTwo, setPlayerTwo] = useState("");
   const [result, setResult] = useState([]);
-  const textInputPlayerOne = (event) => {
+  const textInputPlayerOne = event => {
     setPlayerOne(event.nativeEvent.text);
   };
 
-  const textInputPlayerTwo = (event) => {
+  const textInputPlayerTwo = event => {
     setPlayerTwo(event.nativeEvent.text);
   };
   const checkPlay = () => {
     axios
       .get(`https://api.github.com/users/${playerOne}`)
-      .then((playerOneData) => {
+      .then(playerOneData => {
         let playerGithubOneData = playerOneData.data;
         axios
           .get(`https://api.github.com/users/${playerTwo}`)
-          .then((playerTwoData) => {
+          .then(playerTwoData => {
             let playerGithubTwoData = playerTwoData.data;
             // console.log(playerGithubTwoData.public_repos);
             // console.log(playerGithubTwoData);
@@ -88,11 +92,11 @@ export function GetUserInformation(props) {
               ]);
             }
           })
-          .catch((error) => {
+          .catch(error => {
             console.log(error);
           });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   };
@@ -114,9 +118,17 @@ export function GetUserInformation(props) {
         <TextInput onChange={textInputPlayerTwo} placeholder="Player Two" />
         <Button title="Play" onPress={checkPlay} />
         {result.length !== 0
-          ? result.map((image) => (
+          ? result.map(image => (
               <View key={Math.random() * 100}>
-                <Text style={{fontWeight:"bold" , color:"yellow" , backgroundColor:"black"}}>The Winner IS </Text>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: "yellow",
+                    backgroundColor: "black"
+                  }}
+                >
+                  The Winner IS{" "}
+                </Text>
                 <Image
                   source={{ uri: image }}
                   style={{ width: 100, height: 100 }}
