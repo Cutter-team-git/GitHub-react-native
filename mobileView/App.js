@@ -5,7 +5,7 @@ import HomeScreen from "./components/homeScreen";
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>GitHub-fullStack-react-native</Text>
+      {/* <Text>GitHub-fullStack-react-native</Text> */}
       <HomeScreen />
     </View>
   );
